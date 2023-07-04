@@ -1,3 +1,6 @@
 *.exe
 *.cpp:tests
+*.dSYM
 .DS_Store
+.cph
+.vscode
