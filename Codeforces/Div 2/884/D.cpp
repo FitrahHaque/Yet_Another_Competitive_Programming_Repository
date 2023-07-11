@@ -58,6 +58,34 @@ const long long mod = 1000000007LL;
 /********************************************* this is boring *********************************************/
 
 void solve(int tc) {
+	int n;
+	cin >> n;
+	vector<int> div;
+	for(int i=1;i*i<=n;i++){
+		if(n%i == 0){
+			div.pb(i);
+			int m = n/i;
+			if(m != i)
+				div.pb(m);
+		}
+	}
+	sort(all(div));
+	int cnt=1;
+	for(int i:div){
+		if(i != cnt){
+			break;
+		}
+		cnt++;
+	}
+	string dom;
+	for(int i=0;i<cnt;i++){
+		dom += 'a'+ i;
+	}
+	string s;
+	for(int i=0;i<n;i++){
+		s += dom[i%cnt];
+	}
+	cout << s << endl;
 }
 
 int main() {
@@ -68,7 +96,7 @@ int main() {
     cout << setprecision(15) << fixed;
 
     int tc = 1;
-//    cin >> tc;
+   cin >> tc;
     for (int t = 1; t <= tc; t++) solve(t);
 //    cerr << "Time elapsed: " << 1.0 * clock() / CLOCKS_PER_SEC << " s\n";
 }

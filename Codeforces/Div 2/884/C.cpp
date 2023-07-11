@@ -58,6 +58,24 @@ const long long mod = 1000000007LL;
 /********************************************* this is boring *********************************************/
 
 void solve(int tc) {
+	int n;
+	cin >> n;
+	vector<ll> a(n),sum(2);
+	bool ase = false;
+	for(int i=0;i<n;i++){
+		cin >> a[i];
+		if(a[i]>=0){
+			ase = true;
+			sum[i%2] += a[i];
+		}
+	}
+	if(!ase){
+		sort(all(a),greater<ll>());
+		cout << a[0] << endl;
+	}
+	else{
+		cout << max(sum[0],sum[1]) << endl;
+	}
 }
 
 int main() {
@@ -68,7 +86,7 @@ int main() {
     cout << setprecision(15) << fixed;
 
     int tc = 1;
-//    cin >> tc;
+   cin >> tc;
     for (int t = 1; t <= tc; t++) solve(t);
 //    cerr << "Time elapsed: " << 1.0 * clock() / CLOCKS_PER_SEC << " s\n";
 }

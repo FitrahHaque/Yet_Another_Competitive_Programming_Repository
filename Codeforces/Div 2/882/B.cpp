@@ -58,30 +58,31 @@ const long long mod = 1000000007LL;
 /********************************************* this is boring *********************************************/
 
 void solve(int tc) {
-	int n;
-	cin >> n;
-	vector<ll> a(n);
-	vector<int> bi(31);
-	for(int i=0;i<n;i++){
-		cin >> a[i];
-	}
-	for(int b=0;b<31;b++){
-		for(int i=0;i<n;i++){
-			if(a[i] & (1LL << b)){
-				
-			}
-			else{
-				bi[b]++;
-			}
-		}
-	}
-	int ans = n;
-	for(int i=0;i<31;i++){
-		ans = min(ans,bi[i]);
-	}
-	if(ans == 0)
-		ans++;
-	cout << ans << endl;
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for(int i=0;i<n;i++){
+        cin >> a[i];
+    }
+    int total = a[0];
+    for(int i=1;i<n;i++){
+        total = total & a[i];
+    }
+    if(total){
+        cout << 1 << endl;
+        return;
+    }
+    int nax = (1<<30) - 1;
+    int cur = nax;
+    int cnt = 0;
+    for(int i=0;i<n;i++){
+        cur = cur & a[i];
+        if(!cur){
+            cnt++;
+            cur = nax;
+        }
+    }
+    cout << cnt << endl;
 }
 
 int main() {
@@ -92,7 +93,7 @@ int main() {
     cout << setprecision(15) << fixed;
 
     int tc = 1;
-   cin >> tc;
+    cin >> tc;
     for (int t = 1; t <= tc; t++) solve(t);
 //    cerr << "Time elapsed: " << 1.0 * clock() / CLOCKS_PER_SEC << " s\n";
 }
