@@ -57,73 +57,79 @@ const long long mod = 1000000007LL;
 
 /********************************************* this is boring *********************************************/
 const int MAX = 5e5+10;
-vector<ll> prm;
-void sieve(){
-	vector<bool> np(MAX);
+vector<int> lpf(MAX),mobius(MAX);
+vector<vector<int>> divs(MAX);
+void init(){
+	lpf[1] = 1;
 	for(int i=2;i<MAX;i++){
-		if(!np[i])
-			prm.pb(i);
-		for(int j=0;j<prm.size() && 1LL*prm[j]*i<MAX;j++){
-			np[i*prm[j]] = true;
-			if(i%prm[j] == 0)
-				break;
-		}
-	}
-}
-void factorize(int n,vector<int>&f){
-	for(int i=0;i<prm.size() && 1LL*prm[i]*prm[i]<=n;i++){
-		if(n%prm[i] == 0){
-			f.pb(prm[i]);
-			while(n%prm[i] == 0){
-				n /= prm[i];
+		if(lpf[i])
+			continue;
+		for(int j=i;j<MAX;j+=i){
+			if(!lpf[j]){
+				lpf[j] = i;
 			}
 		}
 	}
-	if(n>1){
-		f.pb(n);
-	}
 	
+	for(int i=2;i<MAX;i++){
+		for(int j=i;j<MAX;j+=i){
+			divs[j].pb(i);
+		}
+	}
+}
+//*** Mobius Function *** :
+// μ(n) = +1 if n is a square-free positive integer with an even number of prime factors.
+// μ(n) = −1 if n is a square-free positive integer with an odd number of prime factors.
+// μ(n) = 0 if n has a squared prime factor.
+// here, we need the additive inverse of mobius function.
+void constructMobius() {
+	mobius[1] = 1;
+	for(int i=2;i<MAX;i++){
+		if(lpf[i] == i){ //prime
+			mobius[i] = -1;
+		}
+		else if(lpf[i] == lpf[i/lpf[i]]){ // i has a squared prime factor
+			mobius[i] = 0;
+		}
+		else{
+			mobius[i] = (-1) * mobius[i/lpf[i]];
+		}
+	}
 }
 void solve(int tc) {
 	int n,q;
 	cin >> n >> q;
-	vector<int> a(n),on(n);
-	vector<vector<int>> fact(n);
-	map<int,bitset<200005>> p;
+	vector<int> a(n);
 	for(int i=0;i<n;i++){
 		cin >> a[i];
-		factorize(a[i],fact[i]);
 	}
-	int cnt = 0;
-	ll ans = 0;
-	bitset<200005> sm;
+	vector<bool> onShelf(n);
+	vector<int> freq(MAX);
+	// for(int i=0;i<20;i++)
+	// 	cout << i << ":" << mobius[i] << endl;
+	ll cnt=0;
+	ll commonSoFar = 0;
 	while(q--){
 		int x;
 		cin >> x;
 		x--;
-		sm = 0;
-		if(on[x]){
-			cnt--;
-			for(int i:fact[x]){
-				p[i][x] = 0;
+		if(!onShelf[x]){
+			for(int d:divs[a[x]]){
+				commonSoFar += -mobius[d] * freq[d];
+				freq[d]++;
 			}
-			for(int i:fact[x]){
-				sm = sm | p[i];
-			}
-			ans -= cnt - sm.count();	
-			on[x] = false;
+			cnt++;
 		}
 		else{
-			for(int i:fact[x]){
-				sm = sm | p[i];
+			for(int d:divs[a[x]]){
+				freq[d]--;
+				commonSoFar -= -mobius[d] * freq[d];
 			}
-			ans += cnt - sm.count();
-			cnt++;
-			for(int i:fact[x]){
-				p[i][x] = 1;
-			}
-			on[x] = true;
+			cnt--;
 		}
+		onShelf[x] = !onShelf[x];
+		ll pairs = cnt * (cnt - 1) / 2;
+		ll ans = pairs - commonSoFar;
 		cout << ans << endl;
 	}
 }
@@ -134,7 +140,8 @@ int main() {
 //#endif
     IOS
     cout << setprecision(15) << fixed;
-    sieve();
+    init();
+    constructMobius();
     int tc = 1;
 //    cin >> tc;
     for (int t = 1; t <= tc; t++) solve(t);
