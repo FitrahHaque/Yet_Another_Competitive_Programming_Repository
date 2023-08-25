@@ -56,64 +56,30 @@ const int INF = 2047483647;
 const long long mod = 1000000007LL;
 
 /********************************************* this is boring *********************************************/
-
+const int MAX = 1e5+1;
 void solve(int tc) {
-    int n;
+	int n;
     cin >> n;
-    vector<int> L(n),R(n),A(n),B(n);
-    set<int> s;
+    map<int,ll> freq;
+    vector<ll> dp(MAX+1);
     for(int i=0;i<n;i++){
-        cin >> L[i] >> R[i] >> A[i] >> B[i];
-        s.insert(L[i]);
-        s.insert(R[i]);
-        s.insert(A[i]);
-        s.insert(B[i]);
+        int x;
+        cin >> x;
+        freq[x]++;
     }
-    int qq;
-    cin >> qq;
-    vector<int> X(qq);
-    for(int i=0;i<qq;i++){
-        cin >> X[i];
-        s.insert(X[i]);
+    
+    dp[0] = 0;
+    for(int i=1;i<=MAX;i++){
+    	dp[i] = dp[i-1];
+    	if(i == 1){
+    		dp[i] = max(dp[i],freq[i]*i);
+    	}
+    	else{
+    		dp[i] = max(dp[i],dp[i-2] + freq[i]*i);   		
+    	}
     }
-    vector<int> rIdx;
-    //coordinate compression
-    map<int,int> idx;
-    int c=0;
-    for(int i:s){
-        idx[i] = c++;
-        rIdx.pb(i);
-    }
-    int p=0;
-    vector<pair<int,pair<int,int>>> v;
-    for(int i=0;i<n;i++){
-        v.pb(mp(idx[R[i]],mp(idx[B[i]],idx[L[i]])));
-    }
-    sort(all(v));
-    reverse(all(v));   
-    std::priority_queue<pair<int,int>> q;
-    vector<int> ans(c);
-    for(int i=0;i<c;i++){
-        ans[i] = i;
-    }
-    for(int i=c-1;i>=0;i--){
-        while(p<n && v[p].ff == i){
-            q.push(mp(v[p].ss.ff,p));
-            p++;
-        }
-        while(!q.empty() && v[q.top().ss].ss.ss > i){
-            q.pop();
-        }
-        if(!q.empty()) {
-            ans[i] = max(ans[i],ans[q.top().ff]);
-        }
-    }
-    // cout << "size: " << rIdx.size() << endl;
-    // cout << rIdx[ans[idx[X[0]]]] << endl;
-    for(int i=0;i<qq;i++){
-        cout << rIdx[ans[idx[X[i]]]] << " ";
-    }
-    cout << endl;
+    cout << dp[MAX] << endl;
+
 }
 
 int main() {
@@ -124,7 +90,7 @@ int main() {
     cout << setprecision(15) << fixed;
 
     int tc = 1;
-   cin >> tc;
+//    cin >> tc;
     for (int t = 1; t <= tc; t++) solve(t);
 //    cerr << "Time elapsed: " << 1.0 * clock() / CLOCKS_PER_SEC << " s\n";
 }

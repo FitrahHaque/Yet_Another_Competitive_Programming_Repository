@@ -56,64 +56,28 @@ const int INF = 2047483647;
 const long long mod = 1000000007LL;
 
 /********************************************* this is boring *********************************************/
-
+const int MAX = 1e7+1;
+vector<int> prm;
+void sieve() {
+	vector<bool> np(MAX);
+	for(int i=2;i<MAX;i++){
+		if(!np[i])
+			prm.pb(i);
+		for(int j=0;j<prm.size() && 1LL*i*prm[j]<MAX;j++){
+			np[i*prm[j]] = true;
+			if(i%prm[j] == 0)
+				break;
+		}
+	}
+}
 void solve(int tc) {
-    int n;
-    cin >> n;
-    vector<int> L(n),R(n),A(n),B(n);
-    set<int> s;
-    for(int i=0;i<n;i++){
-        cin >> L[i] >> R[i] >> A[i] >> B[i];
-        s.insert(L[i]);
-        s.insert(R[i]);
-        s.insert(A[i]);
-        s.insert(B[i]);
-    }
-    int qq;
-    cin >> qq;
-    vector<int> X(qq);
-    for(int i=0;i<qq;i++){
-        cin >> X[i];
-        s.insert(X[i]);
-    }
-    vector<int> rIdx;
-    //coordinate compression
-    map<int,int> idx;
-    int c=0;
-    for(int i:s){
-        idx[i] = c++;
-        rIdx.pb(i);
-    }
-    int p=0;
-    vector<pair<int,pair<int,int>>> v;
-    for(int i=0;i<n;i++){
-        v.pb(mp(idx[R[i]],mp(idx[B[i]],idx[L[i]])));
-    }
-    sort(all(v));
-    reverse(all(v));   
-    std::priority_queue<pair<int,int>> q;
-    vector<int> ans(c);
-    for(int i=0;i<c;i++){
-        ans[i] = i;
-    }
-    for(int i=c-1;i>=0;i--){
-        while(p<n && v[p].ff == i){
-            q.push(mp(v[p].ss.ff,p));
-            p++;
-        }
-        while(!q.empty() && v[q.top().ss].ss.ss > i){
-            q.pop();
-        }
-        if(!q.empty()) {
-            ans[i] = max(ans[i],ans[q.top().ff]);
-        }
-    }
-    // cout << "size: " << rIdx.size() << endl;
-    // cout << rIdx[ans[idx[X[0]]]] << endl;
-    for(int i=0;i<qq;i++){
-        cout << rIdx[ans[idx[X[i]]]] << " ";
-    }
-    cout << endl;
+	int n;
+	cin >> n;
+	for(int i=0;i<n;i++){
+		cout << prm[i] << " ";
+	}
+	cout << endl;
+	
 }
 
 int main() {
@@ -122,9 +86,9 @@ int main() {
 //#endif
     IOS
     cout << setprecision(15) << fixed;
-
+    sieve();
     int tc = 1;
-   cin >> tc;
+//    cin >> tc;
     for (int t = 1; t <= tc; t++) solve(t);
 //    cerr << "Time elapsed: " << 1.0 * clock() / CLOCKS_PER_SEC << " s\n";
 }

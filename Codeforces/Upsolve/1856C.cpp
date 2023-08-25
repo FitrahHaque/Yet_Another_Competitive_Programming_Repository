@@ -56,64 +56,47 @@ const int INF = 2047483647;
 const long long mod = 1000000007LL;
 
 /********************************************* this is boring *********************************************/
-
+vector<ll> a;
+ll n,k;
+ll f(int i,ll x) {
+	if(x <= a[i])
+		return 0;
+	if(i == n-1) {
+		return INFL;
+	}
+	return x - a[i] + f(i+1,x-1);
+}
+bool good(ll x) {
+	ll res = INFL;
+	for(int i=0;i<n;i++) {
+		ll steps = f(i,x);
+		res = min(res,steps);
+	}
+	return res <= k;
+}
+ll binSearch(ll r) {
+	ll l = 0;
+	while(r>l+1) {
+		ll mid = (l+r)/2;
+		if(good(mid)) {
+			l = mid;
+		}
+		else {
+			r = mid;
+		}
+	}
+	return l;
+}
 void solve(int tc) {
-    int n;
-    cin >> n;
-    vector<int> L(n),R(n),A(n),B(n);
-    set<int> s;
-    for(int i=0;i<n;i++){
-        cin >> L[i] >> R[i] >> A[i] >> B[i];
-        s.insert(L[i]);
-        s.insert(R[i]);
-        s.insert(A[i]);
-        s.insert(B[i]);
-    }
-    int qq;
-    cin >> qq;
-    vector<int> X(qq);
-    for(int i=0;i<qq;i++){
-        cin >> X[i];
-        s.insert(X[i]);
-    }
-    vector<int> rIdx;
-    //coordinate compression
-    map<int,int> idx;
-    int c=0;
-    for(int i:s){
-        idx[i] = c++;
-        rIdx.pb(i);
-    }
-    int p=0;
-    vector<pair<int,pair<int,int>>> v;
-    for(int i=0;i<n;i++){
-        v.pb(mp(idx[R[i]],mp(idx[B[i]],idx[L[i]])));
-    }
-    sort(all(v));
-    reverse(all(v));   
-    std::priority_queue<pair<int,int>> q;
-    vector<int> ans(c);
-    for(int i=0;i<c;i++){
-        ans[i] = i;
-    }
-    for(int i=c-1;i>=0;i--){
-        while(p<n && v[p].ff == i){
-            q.push(mp(v[p].ss.ff,p));
-            p++;
-        }
-        while(!q.empty() && v[q.top().ss].ss.ss > i){
-            q.pop();
-        }
-        if(!q.empty()) {
-            ans[i] = max(ans[i],ans[q.top().ff]);
-        }
-    }
-    // cout << "size: " << rIdx.size() << endl;
-    // cout << rIdx[ans[idx[X[0]]]] << endl;
-    for(int i=0;i<qq;i++){
-        cout << rIdx[ans[idx[X[i]]]] << " ";
-    }
-    cout << endl;
+	cin >> n >> k;
+	a = vector<ll> (n);
+	ll mx = 0;
+	for(int i=0;i<n;i++) {
+		cin >> a[i];
+		mx = max(mx,a[i]);
+	}
+	ll ans = binSearch(mx+k+1);
+	cout << ans << endl;
 }
 
 int main() {

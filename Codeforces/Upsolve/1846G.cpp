@@ -56,64 +56,58 @@ const int INF = 2047483647;
 const long long mod = 1000000007LL;
 
 /********************************************* this is boring *********************************************/
-
+vector<vector<ll>> dp;
+vector<int> d,heal,side;
+int n,m;
+int stringToInt(string s) {
+	reverse(all(s));
+	int ans=0;
+	for(int i=0;i<s.size();i++) {
+		if(s[i] == '1'){
+			ans += 1<<i;
+		}
+	}
+	return ans;
+}
+void getwell(int mask,ll days,int last=0) {
+	if(dp[mask][last] != INFL) {
+		return;
+	}
+	dp[mask][last] = days;
+	for(int i=0;i<m;i++) {
+		int nask = mask ^ heal[i];
+		nask &= mask;
+		nask = nask | side[i];
+		getwell(nask,days+d[i],i+1);
+	}
+}
 void solve(int tc) {
-    int n;
-    cin >> n;
-    vector<int> L(n),R(n),A(n),B(n);
-    set<int> s;
-    for(int i=0;i<n;i++){
-        cin >> L[i] >> R[i] >> A[i] >> B[i];
-        s.insert(L[i]);
-        s.insert(R[i]);
-        s.insert(A[i]);
-        s.insert(B[i]);
-    }
-    int qq;
-    cin >> qq;
-    vector<int> X(qq);
-    for(int i=0;i<qq;i++){
-        cin >> X[i];
-        s.insert(X[i]);
-    }
-    vector<int> rIdx;
-    //coordinate compression
-    map<int,int> idx;
-    int c=0;
-    for(int i:s){
-        idx[i] = c++;
-        rIdx.pb(i);
-    }
-    int p=0;
-    vector<pair<int,pair<int,int>>> v;
-    for(int i=0;i<n;i++){
-        v.pb(mp(idx[R[i]],mp(idx[B[i]],idx[L[i]])));
-    }
-    sort(all(v));
-    reverse(all(v));   
-    std::priority_queue<pair<int,int>> q;
-    vector<int> ans(c);
-    for(int i=0;i<c;i++){
-        ans[i] = i;
-    }
-    for(int i=c-1;i>=0;i--){
-        while(p<n && v[p].ff == i){
-            q.push(mp(v[p].ss.ff,p));
-            p++;
-        }
-        while(!q.empty() && v[q.top().ss].ss.ss > i){
-            q.pop();
-        }
-        if(!q.empty()) {
-            ans[i] = max(ans[i],ans[q.top().ff]);
-        }
-    }
-    // cout << "size: " << rIdx.size() << endl;
-    // cout << rIdx[ans[idx[X[0]]]] << endl;
-    for(int i=0;i<qq;i++){
-        cout << rIdx[ans[idx[X[i]]]] << " ";
-    }
-    cout << endl;
+	cin >> n >> m;
+	string _;
+	cin >> _;
+	int initialSymptom = stringToInt(_);
+	d = vector<int> (m);
+	heal = vector<int> (m);
+	side = vector<int> (m);
+	for(int i=0;i<m;i++) {
+		string a,b;
+		cin >> d[i] >> a >> b;
+		heal[i] = stringToInt(a);
+		side[i] = stringToInt(b);
+	}
+	int nax = 1<<n;
+	dp = vector<vector<ll>> (nax,vector<ll>(m+1,INFL));
+	getwell(initialSymptom,0);
+	ll ans = INFL;
+	for(int i=0;i<=m;i++) {
+		ans = min(ans,dp[0][i]);
+	}
+	if(ans == INFL) {
+		cout << -1 << endl;
+	}
+	else{
+		cout << ans << endl;
+	}
 }
 
 int main() {
