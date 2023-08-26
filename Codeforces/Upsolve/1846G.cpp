@@ -56,9 +56,9 @@ const int INF = 2047483647;
 const long long mod = 1000000007LL;
 
 /********************************************* this is boring *********************************************/
-vector<vector<ll>> dp;
+vector<vector<ll>> dp,gp;
 vector<int> d,heal,side;
-int n,m;
+int n,m,nax;
 int stringToInt(string s) {
 	reverse(all(s));
 	int ans=0;
@@ -69,17 +69,40 @@ int stringToInt(string s) {
 	}
 	return ans;
 }
-void getwell(int mask,ll days,int last=0) {
-	if(dp[mask][last] != INFL) {
-		return;
+void init() {
+	for(int mask=0;mask<nax;mask++) {
+		for(int i=0;i<m;i++) {
+			int nask = mask ^ heal[i];
+			nask &= mask;
+			nask = nask | side[i];
+			gp[mask][nask] = min(gp[mask][nask], (ll)d[i]);
+		}
 	}
-	dp[mask][last] = days;
-	for(int i=0;i<m;i++) {
-		int nask = mask ^ heal[i];
-		nask &= mask;
-		nask = nask | side[i];
-		getwell(nask,days+d[i],i+1);
+}
+ll getwell(int src) {
+	std::priority_queue<pair<ll,int>> q;//(days so far, current submask)
+	dp[src][src] = 0;
+	q.push(mp(0,src));
+	while(!q.empty()) {
+		ll days = -q.top().ff;
+		ll mask = q.top().ss;
+		q.pop();
+		if(mask == 0){
+			return days;
+		}
+		for(int i=0;i<m;i++) {
+			int nask = mask ^ heal[i];
+			nask &= mask;
+			nask = nask | side[i];
+			ll w = gp[mask][nask];
+			ll tmp = days + w;
+			if(dp[mask][nask] > tmp) {
+				dp[mask][nask] = tmp;
+				q.push(mp(-tmp,nask));
+			}
+		}
 	}
+	return -1;
 }
 void solve(int tc) {
 	cin >> n >> m;
@@ -95,19 +118,11 @@ void solve(int tc) {
 		heal[i] = stringToInt(a);
 		side[i] = stringToInt(b);
 	}
-	int nax = 1<<n;
-	dp = vector<vector<ll>> (nax,vector<ll>(m+1,INFL));
-	getwell(initialSymptom,0);
-	ll ans = INFL;
-	for(int i=0;i<=m;i++) {
-		ans = min(ans,dp[0][i]);
-	}
-	if(ans == INFL) {
-		cout << -1 << endl;
-	}
-	else{
-		cout << ans << endl;
-	}
+	nax = 1<<n;
+	dp = vector<vector<ll>> (nax,vector<ll>(nax,INFL));
+	gp = vector<vector<ll>> (nax,vector<ll>(nax,INFL));
+	init();
+	cout << getwell(initialSymptom) << endl;
 }
 
 int main() {
